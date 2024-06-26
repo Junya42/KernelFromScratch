@@ -23,8 +23,6 @@
 #define YELLOW 0x0E
 #define WHITE 0x0F
 
-unsigned short *terminal_buffer;
-unsigned int vga_index;
 
 void clear_screen(void);
 void print_string(char *str, unsigned char color);
