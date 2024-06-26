@@ -1,0 +1,49 @@
+CC = gcc
+CFLAGS = -m32 -nostdlib -nostartfiles -nodefaultlibs -ffreestanding -Wall -Wextra -Werror
+LDFLAGS = -T linker.ld -m elf_i386
+
+SRC_DIR = src
+OBJ_DIR = obj
+
+SRC_FILES = kernel.c keyboard.c screen.c
+HEAD_FILES = kernel.h keyboard.h globals.h
+
+SOURCES = $(addprefix $(SRC_DIR)/, $(SRC_FILES))
+HEADERS = $(addprefix $(SRC_DIR)/, $(HEAD_FILES))
+
+OBJECTS = $(addprefix $(OBJ_DIR)/, $(SRC_FILES:%.c=%.o))
+
+OUTPUT = kernel.bin
+
+all: $(OUTPUT)
+
+$(OUTPUT): boot.o $(OBJECTS)
+	@echo "Linking kernel..."
+	ld $(LDFLAGS) -o $@ $^
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c  $(HEADERS) | $(OBJ_DIR)
+	@echo "Compiling $<..."
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR):
+	@echo "Creating directory $(OBJ_DIR)..."
+	mkdir -p $(OBJ_DIR)
+
+boot.o: boot.asm
+	@echo "Assembling bootloader..."
+	nasm -f elf32 $< -o $@
+
+clean:
+	@echo "Cleaning up object files..."
+	rm -f $(OBJ_DIR)/*.o boot.o
+	rm -rf $(OBJ_DIR)
+
+fclean: clean
+	@echo "Cleaning up kernel binary..."
+	rm -f $(OUTPUT)
+
+run:
+	@echo "Running kernel in QEMU..."
+	qemu-system-i386 -kernel $(OUTPUT)
+
+.PHONY: all clean fclean run
