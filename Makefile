@@ -53,8 +53,13 @@ fclean: clean
 	rm -f $(KERNEL_BIN)
 	rm -f $(ISO)
 
+init:
+	@echo "Installing dependencies..."
+	sudo apt-get update
+	sudo apt-get install -y gcc nasm qemu-system-x86 grub-pc-bin grub-common xorriso mtools
+
 run:
 	@echo "Running iso in QEMU..."
 	qemu-system-i386 -no-reboot -no-shutdown -s -cdrom $(ISO)
 
-.PHONY: all clean fclean run
+.PHONY: all clean fclean init run
