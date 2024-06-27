@@ -13,21 +13,13 @@ HEADERS = $(addprefix $(SRC_DIR)/, $(HEAD_FILES))
 
 OBJECTS = $(addprefix $(OBJ_DIR)/, $(SRC_FILES:%.c=%.o))
 
-KERNEL_BIN = kernel.bin
+OUTPUT = kernel.bin
 
-ISO = kfs.iso
+ISO = kfs
 
-all: $(ISO)
+all: $(OUTPUT)
 
-$(ISO): $(KERNEL_BIN) grub.cfg
-	@echo "Creating ISO image..."
-	mkdir -p isodir/boot/grub
-	cp $(KERNEL_BIN) isodir/boot/grub/$(KERNEL_BIN)
-	cp grub.cfg isodir/boot/grub/grub.cfg
-	grub-mkrescue -o $@ isodir
-	rm -rf isodir
-
-$(KERNEL_BIN): boot.o $(OBJECTS)
+$(OUTPUT): boot.o $(OBJECTS)
 	@echo "Linking kernel..."
 	ld $(LDFLAGS) -o $@ $^
 
@@ -50,11 +42,10 @@ clean:
 
 fclean: clean
 	@echo "Cleaning up kernel binary..."
-	rm -f $(KERNEL_BIN)
-	rm -f $(ISO)
+	rm -f $(OUTPUT)
 
 run:
-	@echo "Running iso in QEMU..."
-	qemu-system-i386 -no-reboot -no-shutdown -s -cdrom $(ISO)
+	@echo "Running kernel in QEMU..."
+	qemu-system-i386 -kernel $(OUTPUT)
 
 .PHONY: all clean fclean run
