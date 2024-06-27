@@ -3,8 +3,10 @@
 
 #define VGA_ADDRESS 0xB8000
 
-#define LINES 80
-#define COLUMNS 25
+#define ROWS 25
+#define COLUMNS 80
+
+#define VGA_BUFFER_SIZE (ROWS * COLUMNS)
 
 #define BLACK 0x00
 #define BLUE 0x01
@@ -27,8 +29,11 @@
 void clear_screen(void);
 void print_string(char *str, unsigned char color);
 void print_char(char c, unsigned char color);
+void print_number(int n, unsigned char color);
+void prompt(void);
 
-#define PRINT_CHAR(c) print_char(c, BLACK)
-#define PRINT_STRING(str) print_string(str, BLACK)
+#define PRINT_CHAR(c) print_char(c, LIGHT_GRAY)
+#define PRINT_STRING(str) print_string(str, LIGHT_GRAY)
+#define PRINT_NUMBER(n) print_number(n, LIGHT_GRAY)
 
 #endif

@@ -1,37 +1,39 @@
 #include "keyboard.h"
 #include "screen.h"
+#include "idt.h"
 
-static char input_table[256] = {
+static unsigned char input_table[256] = {
     0, 27, '1', '2', '3', '4', '5', '6', '7', '8',
     '9', '0', '-', '=', '\b',
     '\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',
-    0, //* Control */
+    0, // Control
     'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';',
-    '\'', '`', 0, /* Left shift */
-    '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 0, /* Right shift */
+    '\'', '`', 0, // Left shift
+    '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 0, // Right shift
     '*',
-    0, /* Alt */
+    0, // Alt
     ' ',
-    0, /* Caps Lock */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* F1 - F10 Keys */
-    0, /* Num Lock */
-    0, /* Scroll Lock */
-    0, /* Home Key */
-    0, /* Up Arrow */
-    0, /* Page Up */
+    0, // Caps Lock
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // F1 - F10 Keys
+    0, // Num Lock
+    0, // Scroll Lock
+    0, // Home Key
+    0, // Up Arrow
+    0, // Page Up
     '-',
-    0, /* Left Arrow */
+    0, // Left Arrow
     0,
-    0, /* Right Arrow */
+    0, // Right Arrow
     '+',
-    0, /* End Key */
-    0, /* Down Arrow */
-    0, /* Page Down */
-    0, /* Insert Key */
-    0, /* Delete Key */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, /* F11 - F12 keys */
-    0 /* Other non mapped keys */
+    0, // End Key
+    0, // Down Arrow
+    0, // Page Down
+    0, // Insert Key
+    0, // Delete Key
+    0, 0, 0, 0, 0, 0, 0, 0, 0, // F11 - F12 keys
+    0, // Other non-mapped keys
 };
+
 
 static char input_table_shift[256] = {
         0, 27, '!', '@', '#', '$', '%', '^', '&', '*',
@@ -67,14 +69,20 @@ static char input_table_shift[256] = {
 
 int ctrlshift = 0;
 
-static inline uint8_t inb(uint16_t port) { // function to get input from port
-    uint8_t ret;
-    asm volatile ("inb %1, %0" : "=a"(ret) : "Nd"(port));
-    return ret;
-}
-
 unsigned char get_input_bytes() {
     return inb(0x60);
+}
+
+char test_inputb_to_char(unsigned char inputb) {
+    // Add your scan code to character conversion logic here
+    // Example for a few keys:
+    switch(inputb) {
+        case 0x1E: return 'a';
+        case 0x30: return 'b';
+        case 0x2E: return 'c';
+        // Add more scan codes as needed
+        default: return 0;
+    }
 }
 
 char inputb_to_char(uint8_t inputb) {
@@ -111,6 +119,11 @@ void keyboard_handler() {
     unsigned char inputb;
 
     inputb = get_input_bytes();
+
+    // Debugging: Print the input byte
+    print_string("Input: ", LIGHT_BLUE);
+    print_number(inputb, LIGHT_BLUE);
+    print_string("\n", LIGHT_BLUE);
     
     if (inputb == 0x1D) { // Ctrl pressed
         ctrlshift++;
@@ -122,7 +135,7 @@ void keyboard_handler() {
         ctrlshift -= 2;
     }
 
-    if (!(inputb & 0x80)) { // check if it is a key press event ( not a release event )
+    if (1) { // check if it is a key press event ( not a release event )
 
         char character = inputb_to_char(inputb);
 
@@ -135,12 +148,13 @@ void keyboard_handler() {
                 ctrl_shift_macros(inputb);
                 break;
             default:
-                if (inputb == 0x1C) {
-                    PRINT_CHAR('\n');
-                    print_string("[ aremiki ]: ", RED);
+                if (inputb == 0x1C) { // Enter key
+                    prompt();
                 }
-                else
-                    print_char(character, WHITE);
+                else if (character != 0) {
+                    PRINT_CHAR(character);
+                    PRINT_CHAR('_');
+                }
                 break;
         }
     }
