@@ -10,7 +10,7 @@ void start() {
 	clear_screen();
 	init_gdt();
 	init_idt();
-	title_screen();
+	title_screen(1);
 	init_keyboard();
 
 	microshell();

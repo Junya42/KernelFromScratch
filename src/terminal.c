@@ -1,10 +1,12 @@
 #include "../includes/terminal.h"
 
-void title_screen() {
+unsigned short current_term = 0;
+
+void title_screen(uint8_t screen) {
 
     print_string("\t\xC9\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xBB\n", YELLOW);
     print_string("\t\xBA\t\t\t\t\t\t\t\t\t\t\t\t\t\xBA\n", YELLOW);
-    print_string("\t\xBA\t _     _ _______ _______\t\t\t\t\t\t\xBA\n", YELLOW);
+    printf("\t\xBA\t _     _ _______ _______\t\tScreen %d\t\t\xBA\n", YELLOW, screen);
     print_string("\t\xBA\t |____/  |______ |______\t\t\t\t\t\t\xBA\n", YELLOW);
     print_string("\t\xBA\t |    \\_ |       ______|\t \t\t\t\t   \xBA\n", YELLOW);
     print_string("\t\xBA\t\t\t\t\t\t\t\t\t\t\t\t\t\xBA\n", YELLOW);

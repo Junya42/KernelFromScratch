@@ -4,6 +4,7 @@
 #include "../includes/interrupts.h"
 #include "../includes/io.h"
 #include "../includes/common.h"
+#include "../includes/terminal.h"
 
 uint8_t shift;
 uint8_t ctrl;
@@ -186,8 +187,15 @@ char handle_key_input() { // Needs to be static ?
 		case CAPSLOCK:
 			shift = shift ? 0 : 1;
 			break;
-		case UP_ARROW:
-
+		case F1:
+			current_term = 0;
+			break;
+		case F2:
+			current_term = 1;
+			break;
+		case F3:
+			current_term = 2;
+			break;
 		default:
 
 			if (scancode > 128)

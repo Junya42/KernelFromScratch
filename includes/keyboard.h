@@ -12,6 +12,9 @@
 #define CAPSLOCK 58
 #define CTRL 29
 #define ALT 56
+#define F1 59
+#define F2 60
+#define F3 61
 #define ENTER 28
 #define LEFT_ARROW 75
 #define RIGHT_ARROW 77
