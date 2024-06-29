@@ -72,5 +72,18 @@ void microshell() {
 		prompt();
 		memset(buffer, 0, BUFFER_SIZE);
 		read_line(buffer);
+
+		if (strcmp(buffer, "exit") == 0) {
+			break;
+		} else if (strcmp(buffer, "clear") == 0) {
+			clear_screen();
+		} else if (strcmp(buffer, "help") == 0) {
+			printf("Commands:\n", BLUE);
+			printf("exit: Exit the shell\n", LIGHT_CYAN);
+			printf("clear: Clear the screen\n", LIGHT_CYAN);
+			printf("help: Display this help message\n", LIGHT_CYAN);
+		} else {
+			printf("Command not found: %s\n", LIGHT_RED, buffer);
+		}
 	}
 }
