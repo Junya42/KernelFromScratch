@@ -2,7 +2,8 @@
 # define VGA_H
 
 extern unsigned short *vga_buffer; // VGA buffer
-extern unsigned int vga_index; // VGA buffer index
+extern unsigned int vga_index[3]; // VGA buffer index
+extern unsigned short screen;
 
 #define VGA_ADDRESS 0xB8000
 
@@ -10,6 +11,7 @@ extern unsigned int vga_index; // VGA buffer index
 #define VGA_WIDTH 80
 #define BYTES_PER_CHAR 2
 #define SCREENSIZE VGA_HEIGHT * VGA_WIDTH * BYTES_PER_CHAR
+#define SCREENS 3
 
 #define VGA_BUFFER_SIZE (VGA_HEIGHT * VGA_WIDTH)
 
@@ -30,13 +32,14 @@ extern unsigned int vga_index; // VGA buffer index
 #define YELLOW 0x0E
 #define WHITE 0x0F
 
-
+void init_screens(void);
 void clear_screen(void);
 void backspace(void);
 void delete(void);
 void print_string(char *str, unsigned char color);
 void print_char(char c, unsigned char color);
 void print_number(int n, unsigned char color);
+void change_screen(unsigned short new_screen);
 void move_cursor(void);
 void prompt(void);
 void printf(char *format, unsigned char color, ...);

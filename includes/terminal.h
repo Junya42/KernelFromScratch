@@ -4,8 +4,7 @@
 #include "vga.h"
 #include "stdint.h"
 
-extern unsigned short current_term;
-
-void title_screen(uint8_t screen);
+void title_screen(void);
+void init_terminal(void);
 
 #endif

@@ -188,13 +188,13 @@ char handle_key_input() { // Needs to be static ?
 			shift = shift ? 0 : 1;
 			break;
 		case F1:
-			current_term = 0;
+			change_screen(0);
 			break;
 		case F2:
-			current_term = 1;
+			change_screen(1);
 			break;
 		case F3:
-			current_term = 2;
+			change_screen(2);
 			break;
 		default:
 
