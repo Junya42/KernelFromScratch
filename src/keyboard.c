@@ -1,161 +1,230 @@
-#include "keyboard.h"
-#include "screen.h"
-#include "idt.h"
+#include "../includes/stdint.h"
+#include "../includes/keyboard.h"
+#include "../includes/vga.h"
+#include "../includes/interrupts.h"
+#include "../includes/io.h"
+#include "../includes/common.h"
 
-static unsigned char input_table[256] = {
-    0, 27, '1', '2', '3', '4', '5', '6', '7', '8',
-    '9', '0', '-', '=', '\b',
-    '\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',
-    0, // Control
-    'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';',
-    '\'', '`', 0, // Left shift
-    '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 0, // Right shift
-    '*',
-    0, // Alt
-    ' ',
-    0, // Caps Lock
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // F1 - F10 Keys
-    0, // Num Lock
-    0, // Scroll Lock
-    0, // Home Key
-    0, // Up Arrow
-    0, // Page Up
-    '-',
-    0, // Left Arrow
-    0,
-    0, // Right Arrow
-    '+',
-    0, // End Key
-    0, // Down Arrow
-    0, // Page Down
-    0, // Insert Key
-    0, // Delete Key
-    0, 0, 0, 0, 0, 0, 0, 0, 0, // F11 - F12 keys
-    0, // Other non-mapped keys
+uint8_t shift;
+uint8_t ctrl;
+uint8_t pressedkeys[256];
+uint8_t lastpressedkey = 0;
+
+
+// Scancode -> ASCII
+const uint8_t lower_ascii_codes[256] = {
+    0x00,  0x00,  '1',  '2',     /* 0x00 */
+     '3',  '4',  '5',  '6',     /* 0x04 */
+     '7',  '8',  '9',  '0',     /* 0x08 */
+     '-',  '=',   0x00, 0x00,     /* 0x0C */
+     'q',  'w',  'e',  'r',     /* 0x10 */
+     't',  'y',  'u',  'i',     /* 0x14 */
+     'o',  'p',  '[',  ']',     /* 0x18 */
+    '\n', 0x00,  'a',  's',     /* 0x1C */
+     'd',  'f',  'g',  'h',     /* 0x20 */
+     'j',  'k',  'l',  ';',     /* 0x24 */
+    '\'',  '`', 0x00, '\\',     /* 0x28 */
+     'z',  'x',  'c',  'v',     /* 0x2C */
+     'b',  'n',  'm',  ',',     /* 0x30 */
+     '.',  '/', 0x00,  '*',     /* 0x34 */
+    0x00,  ' ', 0x00, 0x00,     /* 0x38 */
+    0x00, 0x00, 0x00, 0x00,     /* 0x3C */
+    0x00, 0x00, 0x00, 0x00,     /* 0x40 */
+    0x00, 0x00, 0x00,  '7',     /* 0x44 */
+     '8',  '9',  '-',  '4',     /* 0x48 */
+     '5',  '6',  '+',  '1',     /* 0x4C */
+     '2',  '3',  '0',  '.',     /* 0x50 */
+    0x00, 0x00, 0x00, 0x00,     /* 0x54 */
+    0x00, 0x00, 0x00, 0x00      /* 0x58 */
 };
 
-
-static char input_table_shift[256] = {
-        0, 27, '!', '@', '#', '$', '%', '^', '&', '*',
-    '(', ')', '_', '+', '\b',
-    '\t', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n',
-    0, //* Control */
-    'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':',
-    '"', '~', 0, /* Left shift */
-    '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', 0, /* Right shift */
-    '*',
-    0, /* Alt */
-    ' ',
-    0, /* Caps Lock */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* F1 - F10 Keys */
-    0, /* Num Lock */
-    0, /* Scroll Lock */
-    0, /* Home Key */
-    0, /* Up Arrow */
-    0, /* Page Up */
-    '-',
-    0, /* Left Arrow */
-    0,
-    0, /* Right Arrow */
-    '+',
-    0, /* End Key */
-    0, /* Down Arrow */
-    0, /* Page Down */
-    0, /* Insert Key */
-    0, /* Delete Key */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, /* F11 - F12 keys */
-    0 /* Other non mapped keys */
+// Scancode -> ASCII
+const uint8_t upper_ascii_codes[256] = {
+    0x00,  0x00,  '!',  '@',     /* 0x00 */
+     '#',  '$',  '%',  '^',     /* 0x04 */
+     '&',  '*',  '(',  ')',     /* 0x08 */
+     '_',  '+',   0x00, '\t',     /* 0x0C */
+     'Q',  'W',  'E',  'R',     /* 0x10 */
+     'T',  'Y',  'U',  'I',     /* 0x14 */
+     'O',  'P',  '{',  '}',     /* 0x18 */
+    '\n', 0x00,  'A',  'S',     /* 0x1C */
+     'D',  'F',  'G',  'H',     /* 0x20 */
+     'J',  'K',  'L',  ':',     /* 0x24 */
+     '"',  '~', 0x00,  '|',     /* 0x28 */
+     'Z',  'X',  'C',  'V',     /* 0x2C */
+     'B',  'N',  'M',  '<',     /* 0x30 */
+     '>',  '?', 0x00,  '*',     /* 0x34 */
+    0x00,  ' ', 0x00, 0x00,     /* 0x38 */
+    0x00, 0x00, 0x00, 0x00,     /* 0x3C */
+    0x00, 0x00, 0x00, 0x00,     /* 0x40 */
+    0x00, 0x00, 0x00,  '7',     /* 0x44 */
+     '8',  '9',  '-',  '4',     /* 0x48 */
+     '5',  '6',  '+',  '1',     /* 0x4C */
+     '2',  '3',  '0',  '.',     /* 0x50 */
+    0x00, 0x00, 0x00, 0x00,     /* 0x54 */
+    0x00, 0x00, 0x00, 0x00      /* 0x58 */
 };
 
-int ctrlshift = 0;
+uint8_t ctrl_macros(uint8_t scancode) {
 
-unsigned char get_input_bytes() {
-    return inb(0x60);
+	switch (scancode) {
+		case 0x20: /* ctrl + d */
+			break;
+		default:
+			break;
+	}
+	return 0;
 }
 
-char test_inputb_to_char(unsigned char inputb) {
-    // Add your scan code to character conversion logic here
-    // Example for a few keys:
-    switch(inputb) {
-        case 0x1E: return 'a';
-        case 0x30: return 'b';
-        case 0x2E: return 'c';
-        // Add more scan codes as needed
-        default: return 0;
-    }
+uint8_t ctrl_shift_macros(uint8_t scancode) {
+
+	switch (scancode) {
+		case 0x20: /* ctrl + shift + d */
+			break;
+		default:
+			break;
+	}
+	return 0;
 }
 
-char inputb_to_char(uint8_t inputb) {
-    return ctrlshift < 2 ? input_table[inputb] : input_table_shift[inputb];
+char read_pressed_key() {
+	char key = lastpressedkey;
+
+	lastpressedkey = 0;
+	return key;
 }
 
-void ctrl_macros(unsigned char inputb) {
-    switch (inputb)
-    {
-        case 0x26:
-            clear_screen();
-            break; 
-        default:
-            print_string("CTRL MACROS", LIGHT_BLUE);
-            break;
-    }
+int is_defined_key(uint8_t scancode) {
+
+	// replace the if with a switch statement and printf the corresponding key name
+	switch (scancode) {
+		case ESC:
+			//PRINT_STRING(" ESC ");
+			break;
+		case BS:
+			//PRINT_STRING(" BS ");
+			break;
+		case EOT:
+			//PRINT_STRING(" EOT ");
+			break;
+		case DEL:
+			//PRINT_STRING(" DEL ");
+			break;
+		case TAB:
+			//PRINT_STRING(" TAB ");
+			return '\n';
+			break;
+		case SHIFT:
+			//PRINT_STRING(" SHIFT ");
+			break;
+		case CAPSLOCK:
+			//PRINT_STRING(" CAPSLOCK ");
+			break;
+		case CTRL:
+			//PRINT_STRING(" CTRL ");
+			break;
+		case ALT:
+			//PRINT_STRING(" ALT ");
+			break;
+		case ENTER:
+			//PRINT_STRING(" ENTER " );
+			break;
+		case LEFT_ARROW:
+			//PRINT_STRING(" LEFT_ARROW ");
+			break;
+		case RIGHT_ARROW:
+			//PRINT_STRING(" RIGHT_ARROW ");
+			break;
+		default:
+			return 0;
+	}
+	return scancode;
+}
+
+char handle_key_input() { // Needs to be static ?
+
+	uint8_t scancode = inb(0x60);
+
+	if (scancode == 0)
+		return 0;
+
+	/* Key released */
+	if (scancode & 0x80) {
+
+		uint8_t released_key = scancode & 0x7F;
+
+		switch (released_key) {
+			case 0x2A:
+				shift = 0;
+				break;
+			case 0x1D:
+				ctrl = 0;
+				break;
+		}
+
+		pressedkeys[released_key] = 0;
+		return 0;
+	}
+
+	/* Key pressed */
+	if (pressedkeys[scancode] > 0 && pressedkeys[scancode] < 10) { /* if key is already pressed */
+
+		pressedkeys[scancode]++;
+		return 0;
+	}
+	pressedkeys[scancode]++;
+	outb(0x60, 0);
+
+	//printf("scancode %d -> ", YELLOW, scancode);
+	switch (scancode) {
+		case SHIFT:
+			shift = 1;
+			break;
+		case CTRL:
+			ctrl = 1;
+			break;
+		case CAPSLOCK:
+			shift = shift ? 0 : 1;
+			break;
+		case UP_ARROW:
+
+		default:
+
+			if (scancode > 128)
+				return 0;
+
+			if (ctrl)
+				return ctrl_macros(scancode);
+			if (ctrl && shift)
+				return ctrl_shift_macros(scancode);
+
+			lastpressedkey = shift ? upper_ascii_codes[scancode] : lower_ascii_codes[scancode];
+
+			//printf("lastpressekey %d -> ", YELLOW, lastpressedkey);
+			if (is_defined_key(scancode)) {
+				//printf("defined key ->", GREEN);
+				lastpressedkey = scancode;
+			} else {
+				//printf("ascii code %c -> ", CYAN, lastpressedkey);
+			}
+			//PRINT_CHAR('\n');
+
+			return lastpressedkey;
+	}
+	return 0;
+}
+
+static void keyboard_handler(t_registers regs) {
+
+	(void)regs;
+	handle_key_input();
 
 }
 
-void ctrl_shift_macros(unsigned char inputb) {
-    switch (inputb)
-    {
-        case 0x26:
-            clear_screen();
-            break; 
-        default:
-            print_string("CTRL SHIFT MACROS", LIGHT_MAGENTA);
-            break;
-    }
-}
+void init_keyboard(void) {
+	shift = 0;
+	ctrl = 0;
+	memset(pressedkeys, 0, 256);
 
-void keyboard_handler() {
-    
-    unsigned char inputb;
-
-    inputb = get_input_bytes();
-
-    // Debugging: Print the input byte
-    print_string("Input: ", LIGHT_BLUE);
-    print_number(inputb, LIGHT_BLUE);
-    print_string("\n", LIGHT_BLUE);
-    
-    if (inputb == 0x1D) { // Ctrl pressed
-        ctrlshift++;
-    } else if (inputb == 0x9D) { // Ctrl released
-        ctrlshift--;
-    } else if (inputb == 0x2A) { // Shift pressed
-        ctrlshift += 2;
-    } else if (inputb == 0xAA) { // Shift released
-        ctrlshift -= 2;
-    }
-
-    if (1) { // check if it is a key press event ( not a release event )
-
-        char character = inputb_to_char(inputb);
-
-        switch (ctrlshift)
-        {
-            case 1:
-                ctrl_macros(inputb);
-                break;
-            case 3:
-                ctrl_shift_macros(inputb);
-                break;
-            default:
-                if (inputb == 0x1C) { // Enter key
-                    prompt();
-                }
-                else if (character != 0) {
-                    PRINT_CHAR(character);
-                    PRINT_CHAR('_');
-                }
-                break;
-        }
-    }
+	register_interrupt_handler(IRQ1, &keyboard_handler);
 }
