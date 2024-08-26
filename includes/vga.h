@@ -32,6 +32,7 @@ extern unsigned short screen;
 #define YELLOW 0x0E
 #define WHITE 0x0F
 
+void toggle_debug();
 void init_screens(void);
 void clear_screen(void);
 void backspace(void);
@@ -43,6 +44,11 @@ void change_screen(unsigned short new_screen);
 void move_cursor(void);
 void prompt(void);
 void printf(char *format, unsigned char color, ...);
+void serial_printf(const char *format, ...);
+void debug_print(const char* function, const char* file, int line, const char* param_format, ...);
+
+#define DEBUG_PRINT(param_format, ...) \
+    debug_print(__FUNCTION__, __FILE__, __LINE__, param_format, ##__VA_ARGS__)
 
 #define PRINT_CHAR(c) print_char(c, LIGHT_GRAY)
 #define PRINT_STRING(str) print_string(str, LIGHT_GRAY)

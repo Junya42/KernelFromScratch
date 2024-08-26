@@ -20,13 +20,13 @@ void init_gdt()
     gdt_ptr->base = ((uint32_t)(&gdt_entries));
 
     set_gdt_entry_value(0, 0, 0, 0, 0);                // Null segment
-    set_gdt_entry_value(1, 0, 0xFFFFFFFF, (uint8_t)GDT_CODE_PL0, 0xCF); // Kernel code
-    set_gdt_entry_value(2, 0, 0xFFFFFFFF, (uint8_t)GDT_DATA_PL0, 0xCF); // Kernel data
-    set_gdt_entry_value(3, 0, 0xFFFFFFFF, (uint8_t)GDT_STACK_PL0, 0xCF); // Kernel stack
+    set_gdt_entry_value(1, 0, 0xFFFFFFFF, (uint8_t)(GDT_CODE_PL0 & 0xFF), 0xCF); // Kernel code
+    set_gdt_entry_value(2, 0, 0xFFFFFFFF, (uint8_t)(GDT_DATA_PL0 & 0xFF), 0xCF); // Kernel data
+    set_gdt_entry_value(3, 0, 0xFFFFFFFF, (uint8_t)(GDT_STACK_PL0 & 0xFF), 0xCF); // Kernel stack
 
-    set_gdt_entry_value(4, 0, 0xFFFFFFFF, (uint8_t)GDT_CODE_PL3, 0xCF); // User code
-    set_gdt_entry_value(5, 0, 0xFFFFFFFF, (uint8_t)GDT_DATA_PL3, 0xCF); // User data
-    set_gdt_entry_value(6, 0, 0xFFFFFFFF, (uint8_t)GDT_STACK_PL3, 0xCF); // User stack
+    set_gdt_entry_value(4, 0, 0xFFFFFFFF, (uint8_t)(GDT_CODE_PL3 & 0xFF), 0xCF); // User code
+    set_gdt_entry_value(5, 0, 0xFFFFFFFF, (uint8_t)(GDT_DATA_PL3 & 0xFF), 0xCF); // User data
+    set_gdt_entry_value(6, 0, 0xFFFFFFFF, (uint8_t)(GDT_STACK_PL3 & 0xFF), 0xCF); // User stack
 
     gdt_flush(((uint32_t)(gdt_ptr)));
 }
