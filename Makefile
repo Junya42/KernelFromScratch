@@ -8,7 +8,7 @@ ASM_DIR = asm
 OBJ_DIR = obj
 
 SRC_FILES = common.c  io.c isr_handler.c gdt.c idt.c interrupts_handlers.c irq.c kernel.c keyboard.c microshell.c terminal.c vga.c
-HEAD_FILES = common.h io.h gdt.h idt.h interrupts.h keyboard.h stdarg.h stddef.h stdint.h terminal.h vga.h
+HEAD_FILES = common.h io.h gdt.h idt.h interrupts.h keyboard.h stdarg.h stddef.h stdint.h terminal.h vga.h kernel.h
 ASM_FILES = boot.asm gdt_flush.asm idt_flush.asm interrupts.asm isr.asm
 
 SOURCES = $(addprefix $(SRC_DIR)/, $(SRC_FILES))
@@ -85,7 +85,7 @@ init:
 
 run:
 	@echo "$(CCYAN)Running iso in QEMU...$(CEND)"
-	qemu-system-i386 -cdrom $(ISO)
+	qemu-system-i386 -cdrom $(ISO) -serial mon:stdio
 
 log:
 	@echo "$(CCYAN)Running iso in QEMU...$(CEND)"

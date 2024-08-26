@@ -33,34 +33,34 @@
 #define SEG_CODE_EXRDCA    0x0F     /* Execute/Read, conforming, accessed */
  
 /* 0x9A */
-#define GDT_CODE_PL0 SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+#define GDT_CODE_PL0 (SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
                      SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
-                     SEG_PRIV(0)     | SEG_CODE_EXRD
+                     SEG_PRIV(0)     | SEG_CODE_EXRD)
  
 /* 0x92 */
-#define GDT_DATA_PL0 SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+#define GDT_DATA_PL0 (SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
                      SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
-                     SEG_PRIV(0)     | SEG_DATA_RDWR
+                     SEG_PRIV(0)     | SEG_DATA_RDWR)
 
 /* 0x96 */
-#define GDT_STACK_PL0 SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+#define GDT_STACK_PL0 (SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
                      SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
-                     SEG_PRIV(0)     | SEG_DATA_RDWREXPD
+                     SEG_PRIV(0)     | SEG_DATA_RDWREXPD)
 
 /* 0xFA */
-#define GDT_CODE_PL3 SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+#define GDT_CODE_PL3 (SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
                      SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
-                     SEG_PRIV(3)     | SEG_CODE_EXRD
+                     SEG_PRIV(3)     | SEG_CODE_EXRD)
 
 /* 0xF2 */
-#define GDT_DATA_PL3 SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+#define GDT_DATA_PL3 (SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
                      SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
-                     SEG_PRIV(3)     | SEG_DATA_RDWR
+                     SEG_PRIV(3)     | SEG_DATA_RDWR)
 
 /* 0xF6 */
-#define GDT_STACK_PL3 SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+#define GDT_STACK_PL3 (SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
                      SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
-                     SEG_PRIV(3)     | SEG_DATA_RDWREXPD
+                     SEG_PRIV(3)     | SEG_DATA_RDWREXPD)
 
 typedef struct  __attribute__((packed)) gdt_entry
 {

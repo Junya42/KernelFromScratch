@@ -81,6 +81,7 @@ uint8_t ctrl_shift_macros(uint8_t scancode) {
 
 	switch (scancode) {
 		case 0x20: /* ctrl + shift + d */
+			toggle_debug();
 			break;
 		default:
 			break;
@@ -200,12 +201,10 @@ char handle_key_input() { // Needs to be static ?
 
 			if (scancode > 128)
 				return 0;
-
+			if (ctrl && shift) 
+				return ctrl_shift_macros(scancode);
 			if (ctrl)
 				return ctrl_macros(scancode);
-			if (ctrl && shift)
-				return ctrl_shift_macros(scancode);
-
 			lastpressedkey = shift ? upper_ascii_codes[scancode] : lower_ascii_codes[scancode];
 
 			//printf("lastpressekey %d -> ", YELLOW, lastpressedkey);
