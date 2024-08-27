@@ -70,6 +70,30 @@ void serial_print_number(int n) {
     }
 }
 
+void serial_print_unsigned(unsigned int n)
+{
+    if (n >= 10)
+        serial_print_unsigned(n / 10);
+    serial_putc((n % 10) + '0');
+}
+
+void serial_print_hex(unsigned int n) {
+    if (n == 0) {
+        serial_putc('0');
+        return;
+    }
+    char hex_digits[] = "0123456789ABCDEF";
+    char buffer[8];  // 32-bit number has at most 8 hex digits
+    int i = 0;
+    while (n > 0) {
+        buffer[i++] = hex_digits[n % 16];
+        n /= 16;
+    }
+    while (i > 0) {
+        serial_putc(buffer[--i]);
+    }
+}
+
 void serial_printf(const char *format, ...) {
     va_list args;
     va_start(args, format);
@@ -86,6 +110,12 @@ void serial_printf(const char *format, ...) {
                     break;
                 case 'd':
                     serial_print_number(va_arg(args, int));
+                    break;
+                case 'u':
+                    serial_print_unsigned(va_arg(args, unsigned int));
+                    break;
+                case 'x':
+                    serial_print_hex(va_arg(args, unsigned int));
                     break;
                 default:
                     serial_putc(format[i]);
@@ -131,6 +161,12 @@ void debug_print(const char* function, const char* file, int line, const char* p
                     break;
                 case 'd':
                     serial_printf("%d ", va_arg(args, int));
+                    break;
+                case 'u':
+                    serial_printf("%u ", va_arg(args, unsigned int));
+                    break;
+                case 'x':
+                    serial_printf("%x ", va_arg(args, unsigned int));
                     break;
                 case 's':
                     serial_printf("%s ", va_arg(args, char *));
@@ -241,6 +277,12 @@ void    print_number(int n, unsigned char color)
 	print_char(-(n % 10) + '0', color);
 }
 
+void print_unsigned(unsigned int n, unsigned char color)
+{
+    if (n >= 10)
+        print_unsigned(n / 10, color);
+    print_char((n % 10) + '0', color);
+}
 
 void print_string(char *str, unsigned char color) {
 
@@ -299,6 +341,9 @@ void printf(char *format, unsigned char color, ...) {
                     break;
                 case 'd':
                     print_number(va_arg(args, int), color);
+                    break;
+                case 'u':
+                    print_unsigned(va_arg(args, unsigned int), color);
                     break;
                 default:
                     print_char(format[i], color);

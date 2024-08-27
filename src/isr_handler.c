@@ -42,7 +42,7 @@ void isr_handler(t_registers regs)
 {
     if (regs.int_no < 32) { // If the interrupt number is less than 32, it's an exception
 
-        kernel_panic_with_log("Exception: %s (int_no: %d)\n", exception_messages[regs.int_no], regs.int_no);
+        KERNEL_PANIC("Exception: %s (int_no: %d)\n", exception_messages[regs.int_no], regs.int_no);
     } else if (regs.int_no < 256) { // It's an IRQ
         
         if (interrupt_handlers[regs.int_no] != 0) {
@@ -53,6 +53,6 @@ void isr_handler(t_registers regs)
         }
     } else { // It's an invalid interrupt number
 
-        kernel_panic_with_log("Invalid interrupt number: %d\n", regs.int_no);
+        KERNEL_PANIC("Invalid interrupt number: %d\n", regs.int_no);
     }
 }

@@ -73,33 +73,40 @@ void read_line(char buffer[SCREENS][BUFFER_SIZE]) {
 
 void test_memory_allocation() {
     kernel_log("Starting memory allocation test...\n");
+	DEBUG_PRINT("Starting memory allocation test...\n");
 
     // Test 1: Allocate 4KB (1 page)
     void *ptr1 = malloc(4096);
     if (ptr1 == NULL) {
-        kernel_panic("Test 1: malloc failed to allocate 4KB.\n");
+		DEBUG_PRINT("Test 1: malloc failed to allocate 4KB.\n");
+        KERNEL_PANIC("Test 1: malloc failed to allocate 4KB.\n");
     }
 
     // Log the size of the allocated block
     uint32_t size1 = get_size(ptr1);
+	DEBUG_PRINT("Test 1: Allocated size: %u bytes\n", size1);
     kernel_log("Test 1: Allocated size: %u bytes\n", size1);
 
     // Write to the memory to check if it's accessible
     *(int *)ptr1 = 42;
     if (*(int *)ptr1 != 42) {
-        kernel_panic("Test 1: Memory write/read test failed.\n");
+		DEBUG_PRINT("Test 1: Memory write/read test failed.\n");
+        KERNEL_PANIC("Test 1: Memory write/read test failed.\n");
     }
 
+	DEBUG_PRINT("Test 1: Allocated 4KB and successfully wrote to memory.\n");
     kernel_log("Test 1: Allocated 4KB and successfully wrote to memory.\n");
 
     // Test 2: Allocate 8KB (2 pages)
     void *ptr2 = malloc(8192);
     if (ptr2 == NULL) {
-        kernel_panic("Test 2: malloc failed to allocate 8KB.\n");
+		DEBUG_PRINT("Test 2: malloc failed to allocate 8KB.\n");
+        KERNEL_PANIC("Test 2: malloc failed to allocate 8KB.\n");
     }
 
     // Log the size of the allocated block
     uint32_t size2 = get_size(ptr2);
+	DEBUG_PRINT("Test 2: Allocated size: %u bytes\n", size2);
     kernel_log("Test 2: Allocated size: %u bytes\n", size2);
 
     // Write to the memory to check if it's accessible
@@ -110,16 +117,19 @@ void test_memory_allocation() {
 
     for (int i = 0; i < 1024; i++) {
         if (int_ptr2[i] != i) {
-            kernel_panic_with_log("Test 2: Memory write/read test failed at index %d.\n", i);
+			DEBUG_PRINT("Test 2: Memory write/read test failed at index %d.\n", i);
+            KERNEL_PANIC("Test 2: Memory write/read test failed at index %d.\n", i);
         }
     }
 
+	DEBUG_PRINT("Test 2: Allocated 8KB and successfully wrote to memory.\n");
     kernel_log("Test 2: Allocated 8KB and successfully wrote to memory.\n");
 
     // Free the allocated memory
     free(ptr1);
     free(ptr2);
 
+	DEBUG_PRINT("Memory allocation tests passed.\n");
     kernel_log("Memory allocation tests passed.\n");
 }
 
@@ -154,6 +164,7 @@ void microshell() {
 			printf("clear: Clear the screen\n", LIGHT_CYAN);
 			printf("exit: Exit the shell\n", LIGHT_CYAN);
 			printf("help: Display this help message\n", LIGHT_CYAN);
+			printf("test_memory_allocation: Run memory allocation tests\n", LIGHT_MAGENTA);
 			printf("\nShortcuts:\n", BLUE);
 			printf("F1: Change to screen 1\n", LIGHT_CYAN);
 			printf("F2: Change to screen 2\n", LIGHT_CYAN);

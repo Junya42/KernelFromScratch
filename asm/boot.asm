@@ -14,7 +14,8 @@ _start:
     sti
     xor ebp, ebp
     mov esp, stack_space            ; Stack pointer
-    push ebx
+    push ebx                        ; Push multiboot info structure pointer
+    push eax                        ; Push multiboot magic number
     call start                       ; Main call
     jmp .1
 .1:

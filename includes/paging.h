@@ -21,6 +21,9 @@ typedef struct {
 extern void load_page_directory(uint32_t* page_directory);
 extern void enable_paging();
 
+void initialize_memory();
+void initialize_paging();
+
 uint32_t allocate_physical_page();
 uint32_t allocate_virtual_page();
 uint32_t get_physical_address(uint32_t virtual_address);
