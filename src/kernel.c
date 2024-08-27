@@ -52,5 +52,5 @@ void start(unsigned long magic, unsigned long addr) {
 
 	init_keyboard();
 
-	microshell();
+	microshell(); // kernel heap
 }

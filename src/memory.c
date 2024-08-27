@@ -27,8 +27,6 @@ void *allocate_virtual_address(uint32_t size) {
     return allocated_address;
 }
 
-
-
 typedef struct {
     uint32_t size;
 } allocation_header_t;
@@ -42,13 +40,15 @@ void *malloc(uint32_t size) {
         return NULL;
     }
     
+    DEBUG_PRINT("ICI 1");
     allocation_header_t *header = (allocation_header_t *)virtual_address;
+    DEBUG_PRINT("ICI 2");
     header->size = size;
-
+    DEBUG_PRINT("ICI 3");
     void *user_address = (void *)((char *)virtual_address + sizeof(allocation_header_t));
-
+    DEBUG_PRINT("ICI 4");
     uint32_t num_pages = (total_size + PAGE_SIZE - 1) / PAGE_SIZE;
-    
+    DEBUG_PRINT("ICI 5");
     DEBUG_PRINT("BEFORE LOOP");
     for (uint32_t i = 0; i < num_pages; i++) {
         uint32_t physical_page = allocate_physical_page();
