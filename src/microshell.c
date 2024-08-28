@@ -72,10 +72,12 @@ void read_line(char buffer[SCREENS][BUFFER_SIZE]) {
 }
 
 void test_memory_allocation() {
-    kernel_log("Starting memory allocation test...\n");
+    kernel_colored_log(YELLOW, "Starting memory allocation test...\n");
 	DEBUG_PRINT("Starting memory allocation test...\n");
 
     // Test 1: Allocate 4KB (1 page)
+	DEBUG_PRINT("Test 1: Allocating 4KB...\n");
+	kernel_colored_log(YELLOW, "Test 1: Allocating 4KB...\n");
     void *ptr1 = malloc(4096);
     if (ptr1 == NULL) {
 		DEBUG_PRINT("Test 1: malloc failed to allocate 4KB.\n");
@@ -85,7 +87,7 @@ void test_memory_allocation() {
     // Log the size of the allocated block
     uint32_t size1 = get_size(ptr1);
 	DEBUG_PRINT("Test 1: Allocated size: %u bytes\n", size1);
-    kernel_log("Test 1: Allocated size: %u bytes\n", size1);
+    kernel_colored_log(LIGHT_GREEN, "Test 1: Allocated size: %u bytes\n", size1);
 
     // Write to the memory to check if it's accessible
     *(int *)ptr1 = 42;
@@ -95,9 +97,11 @@ void test_memory_allocation() {
     }
 
 	DEBUG_PRINT("Test 1: Allocated 4KB and successfully wrote to memory.\n");
-    kernel_log("Test 1: Allocated 4KB and successfully wrote to memory.\n");
+    kernel_colored_log(LIGHT_GREEN, "Test 1: Allocated 4KB and successfully wrote to memory.\n");
 
     // Test 2: Allocate 8KB (2 pages)
+	DEBUG_PRINT("Test 2: Allocating 8KB...\n");
+	kernel_colored_log(YELLOW, "Test 2: Allocating 8KB...\n");
     void *ptr2 = malloc(8192);
     if (ptr2 == NULL) {
 		DEBUG_PRINT("Test 2: malloc failed to allocate 8KB.\n");
@@ -107,7 +111,7 @@ void test_memory_allocation() {
     // Log the size of the allocated block
     uint32_t size2 = get_size(ptr2);
 	DEBUG_PRINT("Test 2: Allocated size: %u bytes\n", size2);
-    kernel_log("Test 2: Allocated size: %u bytes\n", size2);
+    kernel_colored_log(LIGHT_GREEN, "Test 2: Allocated size: %u bytes\n", size2);
 
     // Write to the memory to check if it's accessible
     int *int_ptr2 = (int *)ptr2;
@@ -123,14 +127,14 @@ void test_memory_allocation() {
     }
 
 	DEBUG_PRINT("Test 2: Allocated 8KB and successfully wrote to memory.\n");
-    kernel_log("Test 2: Allocated 8KB and successfully wrote to memory.\n");
+    kernel_colored_log(LIGHT_GREEN, "Test 2: Allocated 8KB and successfully wrote to memory.\n");
 
     // Free the allocated memory
     free(ptr1);
     free(ptr2);
 
 	DEBUG_PRINT("Memory allocation tests passed.\n");
-    kernel_log("Memory allocation tests passed.\n");
+    kernel_colored_log(GREEN, "Memory allocation tests passed.\n");
 }
 
 

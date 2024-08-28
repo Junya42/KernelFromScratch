@@ -64,33 +64,8 @@ void free_physical_page(uint32_t physical_address) {
     physical_memory_bitmap[bitmap_index] &= ~(1 << bit_index);
 
     DEBUG_PRINT("Freed physical page: %x\n", physical_address);
-    kernel_log("Freed physical page: %x\n", physical_address);
+    kernel_colored_log(LIGHT_GRAY, "Freed physical page: %x\n", physical_address);
 }
-
-
-// uint32_t allocate_physical_page() {
-//     static uint32_t next_free_page = 0x100000;
-//     uint32_t allocated_page = next_free_page;
-//     next_free_page += PAGE_SIZE;
-//     return allocated_page;
-// }
-
-// uint32_t allocate_physical_page() {
-//     for (uint32_t i = 0; i < total_physical_pages; i++) {
-//         uint32_t bitmap_index = i / 32;
-//         uint32_t bit_index = i % 32;
-        
-//         if (!(physical_memory_bitmap[bitmap_index] & (1 << bit_index))) {
-//             physical_memory_bitmap[bitmap_index] |= (1 << bit_index);
-//             uint32_t physical_address = i * PAGE_SIZE;
-//             kernel_log("Allocated physical page: %x\n", physical_address);
-//             return physical_address;
-//         }
-//     }
-//     DEBUG_PRINT("Out of physical memory\n");
-//     KERNEL_PANIC("Out of physical memory\n");
-//     return 0;
-// }
 
 uint32_t allocate_physical_page() {
     for (uint32_t i = 0; i < total_physical_pages; i++) {
@@ -104,7 +79,7 @@ uint32_t allocate_physical_page() {
             physical_memory_bitmap[bitmap_index] |= (1 << bit_index);
             uint32_t physical_address = i * PAGE_SIZE;
             DEBUG_PRINT("Allocated physical page: %x\n", physical_address);
-            kernel_log("Allocated physical page: %x\n", physical_address);
+            kernel_colored_log(LIGHT_GRAY, "Allocated physical page: %x\n", physical_address);
             return physical_address;
         }
     }
@@ -133,20 +108,6 @@ uint32_t get_physical_address(uint32_t virtual_address) {
     return table->entries[page_table_index] & ~0xFFF;
 }
 
-// void initialize_paging() {
-//     for (int i = 0; i < 1024; i++) {
-//         page_directory.entries[i] = 0x00000002;
-//     }
-
-//     for (int i = 0; i < 1024; i++) {
-//         first_page_table.entries[i] = (i * PAGE_SIZE) | PAGE_PRESENT | PAGE_WRITE;
-//     }
-
-//     page_directory.entries[0] = (uint32_t)&first_page_table | PAGE_PRESENT | PAGE_WRITE;
-
-//     load_page_directory((uint32_t*)&page_directory);
-//     enable_paging();
-// }
 
 void initialize_paging() {
     for (int i = 0; i < 1024; i++) {
@@ -164,8 +125,26 @@ void initialize_paging() {
     enable_paging();
 }
 
+// void unmap_page(uint32_t virtual_address) {
+//     DEBUG_PRINT("Unmapping page: %x\n", virtual_address);
+//     uint32_t page_directory_index = virtual_address >> 22;
+//     uint32_t page_table_index = (virtual_address >> 12) & 0x3FF;
+
+//     uint32_t *page_table = (uint32_t *)(page_directory.entries[page_directory_index] & ~0xFFF);
+//     if (page_table) {
+
+//         uint32_t physical_address = get_physical_address(virtual_address);
+//         page_table[page_table_index] = 0;
+        
+//         // Invalidate the TLB (Translation Lookaside Buffer) for this virtual address
+//         asm volatile("invlpg (%0)" ::"r"(virtual_address) : "memory");
+//         DEBUG_PRINT("Page unmapped: %p -> %x\n", virtual_address, physical_address);
+//     } else {
+//         DEBUG_PRINT("Page not mapped: %p\n", virtual_address);
+//     }
+// }
+
 void unmap_page(uint32_t virtual_address) {
-    DEBUG_PRINT("Unmapping page: %x\n", virtual_address);
     uint32_t page_directory_index = virtual_address >> 22;
     uint32_t page_table_index = (virtual_address >> 12) & 0x3FF;
 
@@ -173,11 +152,22 @@ void unmap_page(uint32_t virtual_address) {
     if (page_table) {
         page_table[page_table_index] = 0;
         
-        // Invalidate the TLB (Translation Lookaside Buffer) for this virtual address
+        // Check if the page table is now empty
+        uint8_t page_table_empty = 1;
+        for (int i = 0; i < 1024; i++) {
+            if (page_table[i] != 0) {
+                page_table_empty = 0;
+                break;
+            }
+        }
+        
+        // If the page table is empty, free it
+        if (page_table_empty) {
+            free_physical_page((uint32_t)page_table);
+            page_directory.entries[page_directory_index] = 0;
+        }
+
         asm volatile("invlpg (%0)" ::"r"(virtual_address) : "memory");
-        DEBUG_PRINT("Page unmapped: %x\n", virtual_address);
-    } else {
-        DEBUG_PRINT("Page not mapped: %x\n", virtual_address);
     }
 }
 

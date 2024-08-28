@@ -94,6 +94,11 @@ void serial_print_hex(unsigned int n) {
     }
 }
 
+void serial_print_pointer(void *ptr) {
+    serial_puts("0x");
+    serial_print_hex((unsigned long)ptr);
+}
+
 void serial_printf(const char *format, ...) {
     va_list args;
     va_start(args, format);
@@ -116,6 +121,9 @@ void serial_printf(const char *format, ...) {
                     break;
                 case 'x':
                     serial_print_hex(va_arg(args, unsigned int));
+                    break;
+                case 'p':
+                    serial_print_pointer(va_arg(args, void *));
                     break;
                 default:
                     serial_putc(format[i]);
@@ -171,6 +179,9 @@ void debug_print(const char* function, const char* file, int line, const char* p
                 case 's':
                     serial_printf("%s ", va_arg(args, char *));
                     break;
+                case 'p':
+                    serial_printf("%p ", va_arg(args, void *));
+                    break;
                 default:
                     serial_printf("[Unsupported format specifier]");
                     break;
@@ -183,7 +194,7 @@ void debug_print(const char* function, const char* file, int line, const char* p
     if (!count) {
         serial_printf("[No parameters]");
     }
-    serial_printf("\n\n");
+    serial_printf("\n");
     
     va_end(args);
 }
@@ -325,6 +336,61 @@ void print_char(char c, unsigned char color) {
     move_cursor();
 }
 
+void print_hex(unsigned int n, unsigned char color) {
+    if (n == 0) {
+        print_char('0', color);
+        return;
+    }
+    char hex_digits[] = "0123456789ABCDEF";
+    char buffer[8];  // 32-bit number has at most 8 hex digits
+    int i = 0;
+    while (n > 0) {
+        buffer[i++] = hex_digits[n % 16];
+        n /= 16;
+    }
+    while (i > 0) {
+        print_char(buffer[--i], color);
+    }
+}
+
+void print_pointer(void *ptr, unsigned char color) {
+    print_string("0x", color);
+    print_hex((unsigned long)ptr, color);
+}
+
+void vprintf(char *format, unsigned char color, va_list args) {
+    for (int i = 0; format[i] != '\0'; i++) {
+        if (format[i] == '%') {
+            i++;
+            switch (format[i]) {
+                case 'c':
+                    print_char((char)va_arg(args, int), color);
+                    break;
+                case 's':
+                    print_string(va_arg(args, char *), color);
+                    break;
+                case 'd':
+                    print_number(va_arg(args, int), color);
+                    break;
+                case 'u':
+                    print_unsigned(va_arg(args, unsigned int), color);
+                    break;
+                case 'x':
+                    print_hex(va_arg(args, unsigned int), color);
+                    break;
+                case 'p':
+                    print_pointer(va_arg(args, void *), color);
+                    break;
+                default:
+                    print_char(format[i], color);
+                    break;
+            }
+        } else {
+            print_char(format[i], color);
+        }
+    }
+}
+
 void printf(char *format, unsigned char color, ...) {
     va_list args;
     va_start(args, color);
@@ -344,6 +410,12 @@ void printf(char *format, unsigned char color, ...) {
                     break;
                 case 'u':
                     print_unsigned(va_arg(args, unsigned int), color);
+                    break;
+                case 'x':
+                    print_hex(va_arg(args, unsigned int), color);
+                    break;
+                case 'p':
+                    print_pointer(va_arg(args, void *), color);
                     break;
                 default:
                     print_char(format[i], color);

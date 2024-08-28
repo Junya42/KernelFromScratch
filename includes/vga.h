@@ -1,6 +1,8 @@
 #ifndef VGA_H
 # define VGA_H
 
+#include "stdarg.h"
+
 extern unsigned short *vga_buffer; // VGA buffer
 extern unsigned int vga_index[3]; // VGA buffer index
 extern unsigned short screen;
@@ -43,6 +45,7 @@ void print_number(int n, unsigned char color);
 void change_screen(unsigned short new_screen);
 void move_cursor(void);
 void prompt(void);
+void vprintf(char *format, unsigned char color, va_list args);
 void printf(char *format, unsigned char color, ...);
 void serial_printf(const char *format, ...);
 void debug_print(const char* function, const char* file, int line, const char* param_format, ...);

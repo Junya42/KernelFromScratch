@@ -2,6 +2,7 @@
 # define KERNEL_H
 
 void kernel_log(const char *format, ...);
+void kernel_colored_log(unsigned char color, char *format, ...);
 void kernel_panic(const char *function, const char *file, int line, const char *format, ...);
 
 #define KERNEL_PANIC(format, ...) \
