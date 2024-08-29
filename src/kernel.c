@@ -7,6 +7,7 @@
 #include "../includes/stdarg.h"
 #include "../includes/multiboot.h"
 #include "../includes/paging.h"
+#include "../includes/symbol.h"
 
 void kernel_log(char *format, ...) {
     va_list args;
@@ -56,10 +57,14 @@ void start(unsigned long magic, unsigned long addr) {
 	initialize_memory();
 	initialize_paging();
 
+	init_symbols();
+
 	init_screens();
 	init_terminal();
 
 	init_keyboard();
 
 	microshell(); // kernel heap
+
+	listclear(kernel_symbols);
 }

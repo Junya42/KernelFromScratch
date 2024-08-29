@@ -8,10 +8,12 @@ ASM_DIR = asm
 OBJ_DIR = obj
 
 SRC_FILES = common.c io.c isr_handler.c gdt.c idt.c interrupts_handlers.c irq.c \
-			kernel.c keyboard.c microshell.c terminal.c vga.c paging.c memory.c
+			kernel.c keyboard.c microshell.c terminal.c vga.c paging.c memory.c \
+			chained_list.c symbol.c
 
 HEAD_FILES = common.h io.h gdt.h idt.h interrupts.h keyboard.h stdarg.h stddef.h \
-			 stdint.h terminal.h vga.h paging.h kernel.h memory.h
+			 stdint.h terminal.h vga.h paging.h kernel.h memory.h chained_list.h \
+			 symbol.h
 
 ASM_FILES = boot.asm gdt_flush.asm idt_flush.asm interrupts.asm isr.asm a_paging.asm
 

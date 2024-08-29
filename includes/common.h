@@ -10,5 +10,10 @@ int strcmp(const char *str1, const char *str2);
 size_t strlen(const char *str);
 int to_upper(int c);
 int to_lower(int c);
+char **ft_split(char const *s, char c);
+int	ft_strncmp(const char *s1, const char *s2, size_t n);
+void free_array(char **array);
+char	*ft_strjoin(char *s1, char *s2);
+char	*ft_strdup(const char *s);
 
 #endif
