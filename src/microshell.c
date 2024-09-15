@@ -516,7 +516,7 @@ void microshell()
 		{
 			test_arguments(buffer[screen]);
 		}
-		else if (ft_strcmp(buffer[screen], "crash") == 0) {
+		else if (strcmp(buffer[screen], "crash") == 0) {
 			char *test = malloc(4);
 			
 			free(test);
