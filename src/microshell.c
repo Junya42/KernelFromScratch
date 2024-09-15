@@ -456,7 +456,7 @@ int split_and_write(char *buffer) {
 void microshell()
 {
 
-	print_symbols();
+	//print_symbols();
 	char buffer[SCREENS][BUFFER_SIZE];
 
 	for (int x = 0; x < SCREENS; x++)
