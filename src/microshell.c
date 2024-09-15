@@ -300,7 +300,6 @@ void test_arguments(char *buffer) {
 					}
 					kernel_colored_log(GREEN, "strjoin successful\n");
 					kernel_colored_log(LIGHT_BLUE, "Joined string: %s\n", str);
-					free(str);
 				}
 				free(str);
 				kernel_colored_log(LIGHT_MAGENTA, "Freeing arguments...\n");
@@ -498,10 +497,11 @@ void microshell()
 			printf("clear: Clear the screen\n", LIGHT_CYAN);
 			printf("exit: Exit the shell\n", LIGHT_CYAN);
 			printf("help: Display this help message\n", LIGHT_CYAN);
-			printf("kstack: Print the kernel stack trace\n", LIGHT_CYAN);
+			printf("kstack: Print the kernel stack trace\n\n", LIGHT_CYAN);
 			printf("test_memory_allocation: Run memory allocation tests\n", LIGHT_MAGENTA);
 			printf("test_arguments: Run ft_split and strjoin test\n", LIGHT_MAGENTA);
 			printf("write_to_memory ADDRESS: message -> write_to_memory 0x10B000: Hello world!\n", LIGHT_MAGENTA);
+			printf("crash: crash the system to test out kernel panic\n", LIGHT_MAGENTA);
 			printf("\nShortcuts:\n", BLUE);
 			printf("F1: Change to screen 1\n", LIGHT_CYAN);
 			printf("F2: Change to screen 2\n", LIGHT_CYAN);
@@ -515,6 +515,16 @@ void microshell()
 		else if (ft_strncmp(buffer[screen], "test_arguments", 14) == 0)
 		{
 			test_arguments(buffer[screen]);
+		}
+		else if (ft_strcmp(buffer[screen], "crash") == 0) {
+			char *test = malloc(4);
+			
+			free(test);
+			
+			for (int crash = 0; crash < 10; crash++) {
+				test[crash] = 'X';
+				free(test);
+			}
 		}
 		else
 		{
