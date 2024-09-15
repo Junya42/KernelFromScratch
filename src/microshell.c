@@ -68,7 +68,7 @@ void read_line(char buffer[SCREENS][BUFFER_SIZE])
 			}
 			continue;
 		case ENTER:
-			buffer[screen][buff_idx[screen]] = '\0';
+			//buffer[screen][buff_idx[screen]] = '\0';
 			print_string("\n", LIGHT_GRAY);
 			return;
 		}
@@ -471,6 +471,7 @@ void microshell()
 			prompt();
 		buff_idx[screen] = 0;
 		read_line(buffer);
+		buffer[screen][strlen(buffer[screen])] = 0;
 
 		DEBUG_PRINT("Command entered in screen %d: %s\n", screen, buffer[screen]);
 
@@ -531,6 +532,7 @@ void microshell()
 			printf("Command not found: %s\n", LIGHT_RED, buffer[screen]);
 		}
 		i = 1;
+		memset(buffer[screen], 0, BUFFER_SIZE);
 	}
 }
 
