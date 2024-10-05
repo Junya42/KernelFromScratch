@@ -36,6 +36,7 @@ void kernel_clear_registers(void) {
     asm volatile ("mov $0, %%ebx" ::: "ebx");
     asm volatile ("mov $0, %%ecx" ::: "ecx");
     asm volatile ("mov $0, %%edx" ::: "edx");
+	kernel_colored_log(YELLOW, "All registers have been cleared.\n");
 }
 
 void kernel_panic(const char *function, const char *file, int line, char *format, ...) {
