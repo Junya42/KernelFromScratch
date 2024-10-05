@@ -27,6 +27,17 @@ void kernel_colored_log(unsigned char color, char *format, ...) {
     va_end(args);
 }
 
+void kernel_halt(void) {
+	asm volatile ("hlt");
+}
+
+void kernel_clear_registers(void) {
+	asm volatile ("mov $0, %%eax" ::: "eax");
+    asm volatile ("mov $0, %%ebx" ::: "ebx");
+    asm volatile ("mov $0, %%ecx" ::: "ecx");
+    asm volatile ("mov $0, %%edx" ::: "edx");
+}
+
 void kernel_panic(const char *function, const char *file, int line, char *format, ...) {
 	va_list args;
 	va_start(args, format);
@@ -37,8 +48,9 @@ void kernel_panic(const char *function, const char *file, int line, char *format
 	va_end(args);
 
 	asm volatile("cli");
+	kernel_clear_registers();
 	while (1) {
-		asm volatile("hlt");
+		kernel_halt();
 	}
 }
 
