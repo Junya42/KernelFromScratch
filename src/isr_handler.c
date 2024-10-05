@@ -48,10 +48,9 @@ void isr_handler(t_registers regs)
     if (regs.int_no < 32) { // If the interrupt number is less than 32, it's an exception
 
         DEBUG_PRINT("Exception: %s (int_no: %d)\n", exception_messages[regs.int_no], regs.int_no);
-        print_kernel_stack(STACK_BASE, 200);
         KERNEL_PANIC("Exception: %s (int_no: %d)\n", exception_messages[regs.int_no], regs.int_no);
-    }else if (regs.int_no < 256) { // It's an IRQ
-        
+    }
+    else if (regs.int_no < 256) { // It's an IRQ
         if (interrupt_handlers[regs.int_no] != 0) {
             t_interrupt_handler_func_ptr handler = interrupt_handlers[regs.int_no];
             handler(regs);
