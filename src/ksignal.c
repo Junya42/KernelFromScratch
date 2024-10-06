@@ -32,15 +32,24 @@ void setup_signal_handlers(void) {
 
 void setup_signal_scheduling(int signal, int interval) {
     for (int i = 0; i < MAX_SCHEDULED_SIGNALS; i++) {
+        if (scheduled_signals[i].active && scheduled_signals[i].signal == signal) {
+            scheduled_signals[i].interval = interval;
+            scheduled_signals[i].ticks_until_run = interval;
+            return ;
+        }
+    }
+
+    for (int i = 0; i < MAX_SCHEDULED_SIGNALS; i++) {
         if (!scheduled_signals[i].active) {
             scheduled_signals[i].signal = signal;
             scheduled_signals[i].interval = interval;
             scheduled_signals[i].ticks_until_run = interval;
             scheduled_signals[i].active = 1;
+            return;
         }
     }
+    DEBUG_PRINT("No available slots to schedule the signal %d\n", signal);
 }
-
 void scheduler_tick() {
     for (int i = 0; i < MAX_SCHEDULED_SIGNALS; i++) {
         if (scheduled_signals[i].active && --scheduled_signals[i].ticks_until_run <= 0) {
