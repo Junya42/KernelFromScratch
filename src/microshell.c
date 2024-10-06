@@ -198,7 +198,7 @@ void write_to_memory(uint32_t addr, char *message) {
     }
 }
 
-void    print_kernel_stack(uint32_t addr, int limit)
+void    kdump(uint32_t addr, int limit)
 {
     char *c = (char *)addr;
 
@@ -489,8 +489,8 @@ void microshell()
 		}
 		else if (strcmp(buffer[screen], "kstack") == 0)
 		{
-			//print_kernel_stack(STACK_BASE, STACK_TOP - STACK_BASE);
-			print_kernel_stack(STACK_BASE, 150);
+			//kdump(STACK_BASE, STACK_TOP - STACK_BASE);
+			kdump(STACK_BASE, 150);
 		}
 		else if (strcmp(buffer[screen], "help") == 0)
 		{

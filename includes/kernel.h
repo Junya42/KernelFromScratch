@@ -8,7 +8,7 @@ void kernel_colored_log(unsigned char color, char *format, ...);
 void kernel_panic(const char *function, const char *file, int line, char *format, ...);
 
 #define DUMP_STACK() \
-	print_kernel_stack(STACK_BASE, 200);
+	kdump(STACK_BASE, 200);
 
 #define KERNEL_PANIC(format, ...) \
 	DUMP_STACK(); \
