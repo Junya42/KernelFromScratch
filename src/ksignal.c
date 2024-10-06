@@ -30,17 +30,15 @@ void setup_signal_handlers(void) {
     register_signal_handler(SIG_ALARM, handle_sigalarm);
 }
 
-int setup_signal_scheduling(int signal, int interval) {
+void setup_signal_scheduling(int signal, int interval) {
     for (int i = 0; i < MAX_SCHEDULED_SIGNALS; i++) {
         if (!scheduled_signals[i].active) {
             scheduled_signals[i].signal = signal;
             scheduled_signals[i].interval = interval;
             scheduled_signals[i].ticks_until_run = interval;
             scheduled_signals[i].active = 1;
-            return 0;
         }
     }
-    return -1;
 }
 
 void scheduler_tick() {

@@ -56,5 +56,6 @@ extern signal_handler_t signal_handlers[MAX_SIGNALS];
 void init_signal_handlers(void);
 void init_scheduled_signals(void);
 void trigger_signal(int signal);
+void scheduler_tick();
 
 #endif

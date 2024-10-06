@@ -536,6 +536,7 @@ void microshell()
 		}
 		i = 1;
 		memset(buffer[screen], 0, BUFFER_SIZE);
+		scheduler_tick();
 	}
 }
 
