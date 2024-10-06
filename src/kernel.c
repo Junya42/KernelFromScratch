@@ -78,6 +78,7 @@ void start(unsigned long magic, unsigned long addr) {
 
 	init_keyboard();
 	init_signal_handlers();
+	init_scheduled_signals();
 
 	microshell(); // kernel heap
 

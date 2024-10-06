@@ -2,6 +2,7 @@
 # define KSIGNAL_H
 
 # define MAX_SIGNALS 256
+# define MAX_SCHEDULED_SIGNALS 10
 # define SIGNAL_ONE_SECOND 1
 
 typedef enum {
@@ -38,10 +39,22 @@ typedef enum {
     SIG_POWER_FAILURE = 30,
     SIG_SYSTEM_CALL = 31,
 } signal_t;
+
+typedef struct {
+    int signal;
+    int active;
+    int interval;
+    int ticks_until_run;
+} scheduled_signal_t;
+
+extern scheduled_signal_t scheduled_signals[MAX_SCHEDULED_SIGNALS];
+
 typedef void (*signal_handler_t)(int);
 extern signal_handler_t signal_handlers[MAX_SIGNALS];
 
+
 void init_signal_handlers(void);
+void init_scheduled_signals(void);
 void trigger_signal(int signal);
 
 #endif
