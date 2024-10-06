@@ -7,6 +7,7 @@
 #include "../includes/stdarg.h"
 #include "../includes/multiboot.h"
 #include "../includes/paging.h"
+#include "../includes/ksignal.h"
 //#include "../includes/symbol.h"
 
 void kernel_log(char *format, ...) {
@@ -76,6 +77,7 @@ void start(unsigned long magic, unsigned long addr) {
 	init_terminal();
 
 	init_keyboard();
+	init_signal_handlers();
 
 	microshell(); // kernel heap
 
