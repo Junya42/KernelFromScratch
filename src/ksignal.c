@@ -45,6 +45,7 @@ void scheduler_tick() {
     for (int i = 0; i < MAX_SCHEDULED_SIGNALS; i++) {
         if (scheduled_signals[i].active && --scheduled_signals[i].ticks_until_run <= 0) {
             trigger_signal(scheduled_signals[i].signal);
+            scheduled_signals[i].ticks_until_run = scheduled_signals[i].interval;
         }
     }
 }
@@ -53,7 +54,7 @@ void init_scheduled_signals() {
     for (int i = 0; i < MAX_SCHEDULED_SIGNALS; i++) {
         scheduled_signals[i].active = 0;
     }
-    setup_signal_scheduling(SIG_ALARM, 10);
+    setup_signal_scheduling(SIG_ALARM, 100);
 }
 
 void init_signal_handlers() {
