@@ -1,14 +1,10 @@
 #include "../includes/vga.h"
+#include "../includes/kernel.h"
 
-void handle_sigint(int signal) {
-    printf("SIGINT: %d\n", signal);
+void handle_sigint(int signum) {
+    kernel_colored_log(MAGENTA, "SIGINT: %d\n", signum);
 }
 
 void handle_sigalarm(int signal) {
-    printf("SIGARLARM: %d\n", signal);
+    kernel_colored_log(GREEN, "SIGARLARM: %d\n", signal);
 }
-
-// void handle(int signal) {
-//     printf("SIGARLARM: %d\n", signal);
-
-// }

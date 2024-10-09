@@ -80,9 +80,9 @@ void start(unsigned long magic, unsigned long addr) {
 
 	init_keyboard();
 
-	// signal(SIG_INTERRUPT, handle_sigint);
-	// schedule_signal(SIG_INTERRUPT, 5000);
-
+	signal(SIG_INTERRUPT, handle_sigint);
+	signal(SIG_ALARM, handle_sigalarm);
+	schedule_repeat_signal(SIG_ALARM, (uint64_t)5000, -1);
 	microshell(); // kernel heap
 
 	//listclear(kernel_symbols);

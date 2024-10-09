@@ -397,7 +397,7 @@ int parse_and_write(char *buffer, size_t buffer_length) {
     uint32_t address;
 
     // Copy buffer to local_buffer to ensure null-termination
-    if (buffer_length >= sizeof(local_buffer))
+    if (buffer_length >= (long int)sizeof(local_buffer))
         return -1; // Buffer too large
 
     for (int i = 0; i < buffer_length; i++) {

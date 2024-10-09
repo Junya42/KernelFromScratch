@@ -40,33 +40,6 @@ typedef enum {
     SIG_SYSTEM_CALL = 31,
 } signal_enum_t;
 
-// typedef struct {
-    // int signal;
-    // int active;
-    // int interval;
-    // int ticks_until_run;;
-// } scheduled_signal_t;
-
-// extern scheduled_signal_t scheduled_signals[MAX_SCHEDULED_SIGNALS];
-// typedef void (*signal_handler_t)(int);
-// extern signal_handler_t signal_handlers[MAX_SIGNALS];
-
-// void init_signals(void);
-// void register_signal_handler(int signal, void (*signal_handler_t)(int));
-// void trigger_signal(int signal);
-// void schedule_signal(int signal, int interval, void (*signal_handler_t)(int));
-// void scheduler_tick();
-
-// typedef struct {
-//     uint64_t trigger_time;
-//     void (*signal_handler)(int);
-//     uint64_t delay_ms;
-//     int signum;
-//     int count;
-// } scheduled_signal_t;
-
-// extern int signal_count;
-
 typedef int pid_t;
 
 typedef struct signal_s{
@@ -90,5 +63,12 @@ typedef struct process_node_s {
 extern process_node_t *current_process;
 extern process_node_t *process_list;
 extern volatile uint64_t tick_count;
+
+void trigger_signal(int signum);
+void init_signals();
+void signal(int signum, void (*signal_handler)(int));
+void schedule_repeat_signal(int signum, uint64_t delay_ms, int count);
+void schedule_signal(int signum, uint64_t delay_ms);
+
 
 #endif

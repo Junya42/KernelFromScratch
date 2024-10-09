@@ -6,74 +6,20 @@
 #include "../includes/memory.h"
 #include "../includes/io.h"
 
-// signal_handler_t signal_handlers[MAX_SIGNALS];
-// scheduled_signal_t scheduled_signals[MAX_SCHEDULED_SIGNALS];
-
-// void trigger_signal(int signal) {
-//     if (signal < MAX_SIGNALS && signal_handlers[signal] != NULL) {
-//        signal_handlers[signal](signal);
-//     }
-// }
-
-// void register_signal_handler(int signal, signal_handler_t handler) {
-//     if (signal < MAX_SIGNALS) {
-//         signal_handlers[signal] = handler;
-//     }
-// }
-
-// void schedule_signal(int signal, int interval, signal_handler_t handler) {
-//     for (int i = 0; i < MAX_SCHEDULED_SIGNALS; i++) {
-//         if (scheduled_signals[i].active && scheduled_signals[i].signal == signal) {
-//             scheduled_signals[i].interval = interval;
-//             scheduled_signals[i].ticks_until_run = interval;
-//             if (signal < MAX_SIGNALS) {
-//                 signal_handlers[signal] = handler;
-//             }
-//             return ;
-//         }
-//     }
-
-//     for (int i = 0; i < MAX_SCHEDULED_SIGNALS; i++) {
-//         if (!scheduled_signals[i].active) {
-//             scheduled_signals[i].signal = signal;
-//             scheduled_signals[i].interval = interval;
-//             scheduled_signals[i].ticks_until_run = interval;
-//             scheduled_signals[i].active = 1;
-//             if (signal < MAX_SIGNALS) {
-//                 signal_handlers[signal] = handler;
-//             }
-//             return;
-//         }
-//     }
-//     DEBUG_PRINT("No available slots to schedule the signal %d\n", signal);
-// }
-
-// void scheduler_tick() {
-//     for (int i = 0; i < MAX_SCHEDULED_SIGNALS; i++) {
-//         if (scheduled_signals[i].active && --scheduled_signals[i].ticks_until_run <= 0) {
-//             trigger_signal(scheduled_signals[i].signal);
-//             scheduled_signals[i].ticks_until_run = scheduled_signals[i].interval;
-//         }
-//     }
-// }
-
-
-// void init_signals() {
-//     for (int i = 0; i < MAX_SIGNALS; i++) {
-//         signal_handlers[i] = NULL;
-//     }
-
-//     for (int i = 0; i < MAX_SCHEDULED_SIGNALS; i++) {
-//         scheduled_signals[i].active = 0;
-//     }
-//     initialize_timer(1000);
-// 	register_interrupt_handler(IRQ0, &scheduler_tick);
-// }
-
-
 process_node_t *current_process = (void *)0;
 process_node_t *process_list = (void *)0;
 volatile uint64_t tick_count = 0;
+
+void default_handler(int signum) {
+	(void)signum;
+}
+
+
+void trigger_signal(int signum) {
+    if (signum > -1 && signum <= MAX_SIGNALS) {
+       current_process->process->signals[signum].signal_handler(signum);
+    }
+}
 
 process_t* create_process(pid_t pid) {
     process_t *new_process = (process_t*) malloc(sizeof(process_t));
@@ -81,6 +27,9 @@ process_t* create_process(pid_t pid) {
         return NULL;
     }
     memset(new_process, 0, sizeof(process_t));
+    for (int i = 0; i < MAX_SIGNALS ; i++) {
+	    new_process->signals[i].signal_handler = default_handler;
+    }
     new_process->pid = pid;
     return new_process;
 }
@@ -91,7 +40,7 @@ void add_process(process_t *process) {
         return;
     }
     new_node->process = process;
-    new_node->next = process_list;
+    new_node->next = NULL;
     process_list = new_node;
 }
 
@@ -129,7 +78,7 @@ uint64_t get_time_in_ms() {
 void pit_interrupt_handler(t_registers reg) {
     (void)reg;
     tick_count++;
-    process_node_t *p_list = process_list;
+    process_node_t *p_list = current_process;
     while (p_list != NULL) {
         process_t *process = p_list->process;
         if (process) {
@@ -174,7 +123,7 @@ void schedule_repeat_signal(int signum, uint64_t delay_ms, int count) {
     current_process->process->signals[signum].trigger_time = current_time + delay_ms;
     current_process->process->signals[signum].delay_ms = delay_ms;
     current_process->process->signals[signum].signum = signum;
-    current_process->process->signals[signum].count = count;
+    current_process->process->signals[signum].count = (count <= 0 ? count : count - 1) ;
 }
 
 void init_signals() {
@@ -182,5 +131,5 @@ void init_signals() {
     add_process(kernel_process);
     current_process = process_list;
     init_pit();
-    // register_interrupt_handler(IRQ0, &pit_interrupt_handler);
+    register_interrupt_handler(IRQ0, &pit_interrupt_handler);
 }
