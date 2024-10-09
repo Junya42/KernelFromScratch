@@ -147,6 +147,7 @@ void pit_interrupt_handler(t_registers reg) {
                 }
             }
         }
+        p_list = p_list->next;
     }
 }
 
@@ -158,7 +159,7 @@ void signal(int signum, void (*signal_handler)(int)) {
 void schedule_signal(int signum, uint64_t delay_ms) {
     uint64_t current_time = get_time_in_ms();
 
-    if (signum < 0 || signum >= MAX_SCHEDULED_SIGNALS)
+    if (signum < 0 || signum >= MAX_SIGNALS)
         return;
     current_process->process->signals[signum].trigger_time = current_time + delay_ms;
     current_process->process->signals[signum].delay_ms = delay_ms;
@@ -168,7 +169,7 @@ void schedule_signal(int signum, uint64_t delay_ms) {
 void schedule_repeat_signal(int signum, uint64_t delay_ms, int count) {
     uint64_t current_time = get_time_in_ms();
 
-    if (signum < 0 || signum >= MAX_SCHEDULED_SIGNALS)
+    if (signum < 0 || signum >= MAX_SIGNALS)
         return;
     current_process->process->signals[signum].trigger_time = current_time + delay_ms;
     current_process->process->signals[signum].delay_ms = delay_ms;
@@ -181,5 +182,5 @@ void init_signals() {
     add_process(kernel_process);
     current_process = process_list;
     init_pit();
-    register_interrupt_handler(IRQ0, &pit_interrupt_handler);
+    // register_interrupt_handler(IRQ0, &pit_interrupt_handler);
 }

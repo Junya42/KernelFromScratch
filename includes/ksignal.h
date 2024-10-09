@@ -1,9 +1,7 @@
 #ifndef KSIGNAL_H
 # define KSIGNAL_H
 
-# define MAX_SIGNALS 256
-# define MAX_SCHEDULED_SIGNALS 10
-# define SIGNAL_ONE_SECOND 1
+# define MAX_SIGNALS 32
 
 # include "stdint.h"
 

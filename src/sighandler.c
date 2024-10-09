@@ -7,3 +7,8 @@ void handle_sigint(int signal) {
 void handle_sigalarm(int signal) {
     printf("SIGARLARM: %d\n", signal);
 }
+
+// void handle(int signal) {
+//     printf("SIGARLARM: %d\n", signal);
+
+// }

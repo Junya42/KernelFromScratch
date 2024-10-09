@@ -74,13 +74,14 @@ void start(unsigned long magic, unsigned long addr) {
 
 	//init_symbols();
 
+	init_signals();
 	init_screens();
 	init_terminal();
 
 	init_keyboard();
-	init_signals();
 
-	signal(SIG_INTERRUPT, handle_sigint);
+	// signal(SIG_INTERRUPT, handle_sigint);
+	// schedule_signal(SIG_INTERRUPT, 5000);
 
 	microshell(); // kernel heap
 
