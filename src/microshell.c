@@ -528,8 +528,8 @@ void microshell()
 				free(test);
 			}
 		}
-		else if (strcmp(buffer[screen], "sigint") == 0)
-			trigger_signal(SIG_INTERRUPT);
+		// else if (strcmp(buffer[screen], "sigint") == 0)
+			// trigger_signal(SIG_INTERRUPT);
 		else
 		{
 			printf("Command not found: %s\n", LIGHT_RED, buffer[screen]);

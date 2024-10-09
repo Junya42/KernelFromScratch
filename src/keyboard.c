@@ -200,9 +200,10 @@ char handle_key_input() { // Needs to be static ?
 			break;
 		case 0x2E:
 			if (ctrl) {
-				trigger_signal(SIG_INTERRUPT);
+				// trigger_signal(SIG_INTERRUPT);
 				return 0;
 			}
+			break ;
 		default:
 
 			if (scancode > 128)

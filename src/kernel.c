@@ -80,8 +80,8 @@ void start(unsigned long magic, unsigned long addr) {
 	init_keyboard();
 	init_signals();
 
-	register_signal_handler(SIG_INTERRUPT, handle_sigint);
-    schedule_signal(SIG_ALARM, 100, handle_sigalarm);
+	// register_signal_handler(SIG_INTERRUPT, handle_sigint);
+    // schedule_signal(SIG_ALARM, 100, handle_sigalarm);
 
 	microshell(); // kernel heap
 

@@ -5,6 +5,8 @@
 # define MAX_SCHEDULED_SIGNALS 10
 # define SIGNAL_ONE_SECOND 1
 
+# include "stdint.h"
+
 typedef enum {
     SIG_NONE = 0,
     SIG_HANGUP = 1,
@@ -38,25 +40,57 @@ typedef enum {
     SIG_IO = 29,
     SIG_POWER_FAILURE = 30,
     SIG_SYSTEM_CALL = 31,
+} signal_enum_t;
+
+// typedef struct {
+    // int signal;
+    // int active;
+    // int interval;
+    // int ticks_until_run;;
+// } scheduled_signal_t;
+
+// extern scheduled_signal_t scheduled_signals[MAX_SCHEDULED_SIGNALS];
+// typedef void (*signal_handler_t)(int);
+// extern signal_handler_t signal_handlers[MAX_SIGNALS];
+
+// void init_signals(void);
+// void register_signal_handler(int signal, void (*signal_handler_t)(int));
+// void trigger_signal(int signal);
+// void schedule_signal(int signal, int interval, void (*signal_handler_t)(int));
+// void scheduler_tick();
+
+// typedef struct {
+//     uint64_t trigger_time;
+//     void (*signal_handler)(int);
+//     uint64_t delay_ms;
+//     int signum;
+//     int count;
+// } scheduled_signal_t;
+
+// extern int signal_count;
+
+typedef int pid_t;
+
+typedef struct signal_s{
+    uint64_t trigger_time;
+    void (*signal_handler)(int);
+    uint64_t delay_ms;
+    int signum;
+    int count;
 } signal_t;
 
-typedef struct {
-    int signal;
-    int active;
-    int interval;
-    int ticks_until_run;
-} scheduled_signal_t;
+typedef struct process_s {
+    pid_t pid;
+    signal_t signals[MAX_SIGNALS];
+} process_t;
 
-extern scheduled_signal_t scheduled_signals[MAX_SCHEDULED_SIGNALS];
+typedef struct process_node_s {
+    process_t *process;
+    struct process_node_s *next;
+} process_node_t;
 
-typedef void (*signal_handler_t)(int);
-extern signal_handler_t signal_handlers[MAX_SIGNALS];
-
-
-void init_signals(void);
-void register_signal_handler(int signal, signal_handler_t handler);
-void trigger_signal(int signal);
-void schedule_signal(int signal, int interval, signal_handler_t handler);
-void scheduler_tick();
+extern process_node_t *current_process;
+extern process_node_t *process_list;
+extern volatile uint64_t tick_count;
 
 #endif
