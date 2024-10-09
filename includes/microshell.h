@@ -17,7 +17,7 @@
 void microshell();
 void read_line(char buffer[SCREENS][BUFFER_SIZE]);
 void test_memory_allocation();
-void print_kernel_stack(uint32_t addr, int limit);
+void kdump(uint32_t addr, int limit);
 void test_arguments(char *buffer);
 
 #endif

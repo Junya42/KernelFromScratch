@@ -4,6 +4,7 @@
 #include "../includes/kernel.h"
 #include "../includes/memory.h"
 #include "../includes/microshell.h"
+#include "../includes/ksignal.h"
 
 int buff_idx[3] = {0, 0, 0};
 
@@ -198,7 +199,7 @@ void write_to_memory(uint32_t addr, char *message) {
     }
 }
 
-void    print_kernel_stack(uint32_t addr, int limit)
+void    kdump(uint32_t addr, int limit)
 {
     char *c = (char *)addr;
 
@@ -396,7 +397,7 @@ int parse_and_write(char *buffer, size_t buffer_length) {
     uint32_t address;
 
     // Copy buffer to local_buffer to ensure null-termination
-    if (buffer_length >= sizeof(local_buffer))
+    if (buffer_length >= (long int)sizeof(local_buffer))
         return -1; // Buffer too large
 
     for (int i = 0; i < buffer_length; i++) {
@@ -489,8 +490,8 @@ void microshell()
 		}
 		else if (strcmp(buffer[screen], "kstack") == 0)
 		{
-			//print_kernel_stack(STACK_BASE, STACK_TOP - STACK_BASE);
-			print_kernel_stack(STACK_BASE, 150);
+			//kdump(STACK_BASE, STACK_TOP - STACK_BASE);
+			kdump(STACK_BASE, 150);
 		}
 		else if (strcmp(buffer[screen], "help") == 0)
 		{
@@ -519,14 +520,16 @@ void microshell()
 		}
 		else if (strcmp(buffer[screen], "crash") == 0) {
 			char *test = malloc(4);
-			
+
 			free(test);
-			
+
 			for (int crash = 0; crash < 10; crash++) {
 				test[crash] = 'X';
 				free(test);
 			}
 		}
+		// else if (strcmp(buffer[screen], "sigint") == 0)
+			// trigger_signal(SIG_INTERRUPT);
 		else
 		{
 			printf("Command not found: %s\n", LIGHT_RED, buffer[screen]);

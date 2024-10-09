@@ -2,6 +2,7 @@
 #include "../includes/kernel.h"
 #include "../includes/memory.h"
 #include "../includes/vga.h"
+#include "../includes/microshell.h"
 
 extern t_interrupt_handler_func_ptr interrupt_handlers[256];
 
@@ -48,8 +49,8 @@ void isr_handler(t_registers regs)
 
         DEBUG_PRINT("Exception: %s (int_no: %d)\n", exception_messages[regs.int_no], regs.int_no);
         KERNEL_PANIC("Exception: %s (int_no: %d)\n", exception_messages[regs.int_no], regs.int_no);
-    }else if (regs.int_no < 256) { // It's an IRQ
-        
+    }
+    else if (regs.int_no < 256) { // It's an IRQ
         if (interrupt_handlers[regs.int_no] != 0) {
             t_interrupt_handler_func_ptr handler = interrupt_handlers[regs.int_no];
             handler(regs);

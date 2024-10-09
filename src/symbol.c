@@ -72,7 +72,7 @@ void init_symbols() {
 	listadd_back(kernel_symbols, create_symbol(&microshell, "microshell"));
 	listadd_back(kernel_symbols, create_symbol(&read_line, "read_line"));
 	listadd_back(kernel_symbols, create_symbol(&test_memory_allocation, "test_memory_allocation"));
-	listadd_back(kernel_symbols, create_symbol(&print_kernel_stack, "print_kernel_stack"));
+	listadd_back(kernel_symbols, create_symbol(&kdump, "kdump"));
 	listadd_back(kernel_symbols, create_symbol(&test_arguments, "test_arguments"));
 	listadd_back(kernel_symbols, create_symbol(&lookup_symbol, "lookup_symbol"));
 }
