@@ -46,12 +46,26 @@ void schedule_signal(int signal, int interval, signal_handler_t handler) {
 }
 
 void scheduler_tick() {
+    static uint32_t tick_count = 0;
+    tick_count++;
+
     for (int i = 0; i < MAX_SCHEDULED_SIGNALS; i++) {
         if (scheduled_signals[i].active && --scheduled_signals[i].ticks_until_run <= 0) {
             trigger_signal(scheduled_signals[i].signal);
             scheduled_signals[i].ticks_until_run = scheduled_signals[i].interval;
         }
     }
+
+    if (tick_count % 1000 == 0) {
+        printf("Tick count: %u\n", tick_count);
+    }
+}
+
+void initialize_timer(uint32_t frequency) {
+    uint32_t divisor = 1193182 / frequency;
+    outb(0x43, 0x36);
+    outb(0x40, divisor & 0xFF);
+    outb(0x40, (divisor >> 8) & 0xFF);
 }
 
 void init_signals() {
@@ -62,5 +76,6 @@ void init_signals() {
     for (int i = 0; i < MAX_SCHEDULED_SIGNALS; i++) {
         scheduled_signals[i].active = 0;
     }
+    initialize_timer(100);
 	register_interrupt_handler(IRQ0, &scheduler_tick);
 }
