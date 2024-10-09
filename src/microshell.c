@@ -520,9 +520,9 @@ void microshell()
 		}
 		else if (strcmp(buffer[screen], "crash") == 0) {
 			char *test = malloc(4);
-			
+
 			free(test);
-			
+
 			for (int crash = 0; crash < 10; crash++) {
 				test[crash] = 'X';
 				free(test);
@@ -536,7 +536,6 @@ void microshell()
 		}
 		i = 1;
 		memset(buffer[screen], 0, BUFFER_SIZE);
-		scheduler_tick();
 	}
 }
 

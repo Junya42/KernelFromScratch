@@ -5,7 +5,6 @@
 #include "../includes/io.h"
 #include "../includes/common.h"
 #include "../includes/terminal.h"
-#include "../includes/ksignal.h"
 
 uint8_t shift;
 uint8_t ctrl;
@@ -205,7 +204,7 @@ char handle_key_input() { // Needs to be static ?
 
 			if (ctrl && shift)
 				return ctrl_shift_macros(scancode);
-				
+
 			if (ctrl)
 				return ctrl_macros(scancode);
 
@@ -238,5 +237,4 @@ void init_keyboard(void) {
 	memset(pressedkeys, 0, 256);
 
 	register_interrupt_handler(IRQ1, &keyboard_handler);
-	register_interrupt_handler(IRQ0, &scheduler_tick);
 }

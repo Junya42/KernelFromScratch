@@ -8,6 +8,7 @@
 #include "../includes/multiboot.h"
 #include "../includes/paging.h"
 #include "../includes/ksignal.h"
+#include "../includes/sighandler.h"
 //#include "../includes/symbol.h"
 
 void kernel_log(char *format, ...) {
@@ -77,8 +78,10 @@ void start(unsigned long magic, unsigned long addr) {
 	init_terminal();
 
 	init_keyboard();
-	init_signal_handlers();
-	init_scheduled_signals();
+	init_signals();
+
+	register_signal_handler(SIG_INTERRUPT, handle_sigint);
+    schedule_signal(SIG_ALARM, 100, handle_sigalarm);
 
 	microshell(); // kernel heap
 

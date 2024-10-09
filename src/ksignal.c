@@ -1,17 +1,10 @@
 #include "../includes/ksignal.h"
 #include "../includes/stddef.h"
 #include "../includes/vga.h"
+#include "../includes/interrupts.h"
 
 signal_handler_t signal_handlers[MAX_SIGNALS];
 scheduled_signal_t scheduled_signals[MAX_SCHEDULED_SIGNALS];
-
-void handle_sigint(int signal) {
-    printf("SIGINT: %d\n", signal);
-}
-
-void handle_sigalarm(int signal) {
-    printf("SIGARLARM: %d\n", signal);
-}
 
 void trigger_signal(int signal) {
     if (signal < MAX_SIGNALS && signal_handlers[signal] != NULL) {
@@ -25,16 +18,14 @@ void register_signal_handler(int signal, signal_handler_t handler) {
     }
 }
 
-void setup_signal_handlers(void) {
-    register_signal_handler(SIG_INTERRUPT, handle_sigint);
-    register_signal_handler(SIG_ALARM, handle_sigalarm);
-}
-
-void setup_signal_scheduling(int signal, int interval) {
+void schedule_signal(int signal, int interval, signal_handler_t handler) {
     for (int i = 0; i < MAX_SCHEDULED_SIGNALS; i++) {
         if (scheduled_signals[i].active && scheduled_signals[i].signal == signal) {
             scheduled_signals[i].interval = interval;
             scheduled_signals[i].ticks_until_run = interval;
+            if (signal < MAX_SIGNALS) {
+                signal_handlers[signal] = handler;
+            }
             return ;
         }
     }
@@ -45,11 +36,15 @@ void setup_signal_scheduling(int signal, int interval) {
             scheduled_signals[i].interval = interval;
             scheduled_signals[i].ticks_until_run = interval;
             scheduled_signals[i].active = 1;
+            if (signal < MAX_SIGNALS) {
+                signal_handlers[signal] = handler;
+            }
             return;
         }
     }
     DEBUG_PRINT("No available slots to schedule the signal %d\n", signal);
 }
+
 void scheduler_tick() {
     for (int i = 0; i < MAX_SCHEDULED_SIGNALS; i++) {
         if (scheduled_signals[i].active && --scheduled_signals[i].ticks_until_run <= 0) {
@@ -59,16 +54,13 @@ void scheduler_tick() {
     }
 }
 
-void init_scheduled_signals() {
-    for (int i = 0; i < MAX_SCHEDULED_SIGNALS; i++) {
-        scheduled_signals[i].active = 0;
-    }
-    setup_signal_scheduling(SIG_ALARM, 100);
-}
-
-void init_signal_handlers() {
+void init_signals() {
     for (int i = 0; i < MAX_SIGNALS; i++) {
         signal_handlers[i] = NULL;
     }
-    setup_signal_handlers();
+
+    for (int i = 0; i < MAX_SCHEDULED_SIGNALS; i++) {
+        scheduled_signals[i].active = 0;
+    }
+	register_interrupt_handler(IRQ0, &scheduler_tick);
 }

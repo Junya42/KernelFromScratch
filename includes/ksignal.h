@@ -53,9 +53,10 @@ typedef void (*signal_handler_t)(int);
 extern signal_handler_t signal_handlers[MAX_SIGNALS];
 
 
-void init_signal_handlers(void);
-void init_scheduled_signals(void);
+void init_signals(void);
+void register_signal_handler(int signal, signal_handler_t handler);
 void trigger_signal(int signal);
+void schedule_signal(int signal, int interval, signal_handler_t handler);
 void scheduler_tick();
 
 #endif
