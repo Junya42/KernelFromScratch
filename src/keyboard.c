@@ -5,6 +5,7 @@
 #include "../includes/io.h"
 #include "../includes/common.h"
 #include "../includes/terminal.h"
+#include "../includes/ksignal.h"
 
 uint8_t shift;
 uint8_t ctrl;
@@ -197,6 +198,11 @@ char handle_key_input() { // Needs to be static ?
 		case F3:
 			change_screen(2);
 			break;
+		case 0x2E:
+			if (ctrl) {
+				trigger_signal(SIG_INTERRUPT);
+				return 0;
+			}
 		default:
 
 			if (scancode > 128)
