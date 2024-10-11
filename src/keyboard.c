@@ -72,6 +72,9 @@ uint8_t ctrl_macros(uint8_t scancode) {
 	switch (scancode) {
 		case 0x20: /* ctrl + d */
 			break;
+		case 0x2E:
+			trigger_signal(SIG_INTERRUPT);
+			break;
 		default:
 			break;
 	}
@@ -198,12 +201,6 @@ char handle_key_input() { // Needs to be static ?
 		case F3:
 			change_screen(2);
 			break;
-		case 0x2E:
-			if (ctrl) {
-				trigger_signal(SIG_INTERRUPT);
-				return 0;
-			}
-			break ;
 		default:
 
 			if (scancode > 128)
