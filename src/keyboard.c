@@ -74,7 +74,7 @@ uint8_t ctrl_macros(uint8_t scancode) {
 			break;
 		case 0x2E:
 			trigger_signal(SIG_INTERRUPT);
-			break;
+			break ;
 		default:
 			break;
 	}

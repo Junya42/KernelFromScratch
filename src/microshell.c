@@ -5,6 +5,7 @@
 #include "../includes/memory.h"
 #include "../includes/microshell.h"
 #include "../includes/ksignal.h"
+#include "../includes/sighandler.h"
 
 int buff_idx[3] = {0, 0, 0};
 
@@ -527,6 +528,13 @@ void microshell()
 				test[crash] = 'X';
 				free(test);
 			}
+		}
+		else if (strcmp(buffer[screen], "handle_sigint") == 0) {
+
+			signal(SIG_INTERRUPT, handle_sigint);	
+		}
+		else if (strcmp(buffer[screen], "handle_sigalarm") == 0) {
+			signal(SIG_ALARM, handle_sigalarm);
 		}
 		// else if (strcmp(buffer[screen], "sigint") == 0)
 			// trigger_signal(SIG_INTERRUPT);
